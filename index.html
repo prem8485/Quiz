@@ -92,6 +92,17 @@ body{margin:0;font-family:Arial,sans-serif;background:#f3f5f8;color:#222}
 .admin-answer.correct{background:#e8f5e9;border-left:5px solid #2e7d32}
 .admin-answer.wrong{background:#ffebee;border-left:5px solid #d32f2f}
 .admin-answer.unanswered{background:#fff8e1;border-left:5px solid #ff9800}
+/* Discourage selecting/copying test content while the assessment is active. */
+body.test-active, body.test-active #testPage, body.test-active #testPage * {
+    -webkit-user-select:none !important;
+    -moz-user-select:none !important;
+    -ms-user-select:none !important;
+    user-select:none !important;
+}
+body.test-active #testPage img {
+    -webkit-user-drag:none;
+    user-drag:none;
+}
 @media(max-width:700px){
 .header{padding:0 12px}
 .logo{font-size:15px}
@@ -160,6 +171,14 @@ body{margin:0;font-family:Arial,sans-serif;background:#f3f5f8;color:#222}
 
         <button class="start-btn" onclick="startTest()">Start Test →</button>
         <button type="button" class="admin-entry-btn" onclick="showAdminLogin()">Admin Login</button>
+    </div>
+</div>
+
+<div id="screenshotWarning" style="display:none;position:fixed;inset:0;background:rgba(23,43,77,.97);color:white;z-index:100000;align-items:center;justify-content:center;text-align:center;padding:30px;">
+    <div class="warning-box">
+        <h2 style="color:#ff5252;">Screenshot Restricted</h2>
+        <p>Screen capture is not permitted during this assessment. Please return to the test.</p>
+        <button class="fullscreen-btn" type="button" onclick="dismissScreenshotWarning()">Return to Test</button>
     </div>
 </div>
 
@@ -487,14 +506,37 @@ document.addEventListener("keydown", function(event) {
 
     const key = event.key.toLowerCase();
 
+    // Block common copy, cut, paste, select-all, print/save, view-source and developer-tools shortcuts.
     if (
-        (event.ctrlKey && ["c", "v", "x", "a", "u"].includes(key)) ||
+        (event.ctrlKey && ["c", "v", "x", "a", "u", "p", "s"].includes(key)) ||
+        (event.metaKey && ["c", "v", "x", "a", "p", "s"].includes(key)) ||
         event.key === "F12" ||
         (event.ctrlKey && event.shiftKey && ["i", "j", "c"].includes(key))
     ) {
         event.preventDefault();
+        event.stopPropagation();
+    }
+
+    // Best-effort browser deterrent for Print Screen; native OS screenshots cannot be reliably blocked.
+    if (event.key === "PrintScreen") {
+        event.preventDefault();
+        showScreenshotWarning();
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText("").catch(function() {});
+            }
+        } catch (error) {}
     }
 });
+
+function showScreenshotWarning() {
+    if (!testStarted || testSubmitted) return;
+    document.getElementById("screenshotWarning").style.display = "flex";
+}
+
+function dismissScreenshotWarning() {
+    document.getElementById("screenshotWarning").style.display = "none";
+}
 
 function startTest() {
     studentName = document.getElementById("studentName").value.trim();
@@ -544,6 +586,7 @@ function startTest() {
     timeLeft = 05* 60;
     testStarted = true;
     testSubmitted = false;
+    document.body.classList.add("test-active");
 
     document.getElementById("totalQuestions").textContent = questions.length;
     createPalette();
@@ -679,6 +722,8 @@ function submitTest(automatic = false) {
     clearInterval(timer);
 
     document.getElementById("fullscreenWarning").style.display = "none";
+    document.getElementById("screenshotWarning").style.display = "none";
+    document.body.classList.remove("test-active");
     document.getElementById("rollWatermark").style.display = "none";
 
     let correct = 0;

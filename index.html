@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Online Assessment</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f3f5f8;color:#222}
@@ -49,7 +51,7 @@ body{margin:0;font-family:Arial,sans-serif;background:#f3f5f8;color:#222}
 .top-info{background:white;padding:15px 20px;border-radius:7px;margin-bottom:20px;display:flex;justify-content:space-between;gap:10px}
 .question-card{background:white;padding:30px;border-radius:8px;min-height:400px}
 .question-number{color:#666;margin-bottom:15px}
-.question{font-size:20px;font-weight:bold;line-height:1.5;margin-bottom:25px}
+.question{font-size:20px;font-weight:bold;line-height:1.5;margin-bottom:25px;white-space:pre-wrap}
 .option{display:block;padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:7px;cursor:pointer;position:relative;z-index:1}
 .option:hover{background:#f0f5ff}
 .option.selected{background:#e8f0fe;border:2px solid #31558a}
@@ -92,17 +94,32 @@ body{margin:0;font-family:Arial,sans-serif;background:#f3f5f8;color:#222}
 .admin-answer.correct{background:#e8f5e9;border-left:5px solid #2e7d32}
 .admin-answer.wrong{background:#ffebee;border-left:5px solid #d32f2f}
 .admin-answer.unanswered{background:#fff8e1;border-left:5px solid #ff9800}
-/* Discourage selecting/copying test content while the assessment is active. */
-body.test-active, body.test-active #testPage, body.test-active #testPage * {
-    -webkit-user-select:none !important;
-    -moz-user-select:none !important;
-    -ms-user-select:none !important;
-    user-select:none !important;
+body.test-active,body.test-active #testPage,body.test-active #testPage *{
+    -webkit-user-select:none!important;
+    -moz-user-select:none!important;
+    -ms-user-select:none!important;
+    user-select:none!important;
 }
-body.test-active #testPage img {
+body.test-active #testPage img{
     -webkit-user-drag:none;
     user-drag:none;
 }
+.schedule-box{
+    margin:18px 0;
+    padding:15px;
+    border:1px solid #c8d6ea;
+    border-radius:8px;
+    background:#f0f5ff;
+    text-align:center;
+}
+.schedule-box h2{
+    margin:0 0 10px;
+    color:#172b4d;
+    font-size:19px;
+}
+.schedule-box p{margin:6px 0;color:#333}
+#assessmentCountdown{font-weight:bold;color:#b3261e}
+.start-btn:disabled{background:#9aa8bb;cursor:not-allowed;opacity:.8}
 @media(max-width:700px){
 .header{padding:0 12px}
 .logo{font-size:15px}
@@ -119,29 +136,38 @@ body.test-active #testPage img {
 }
 </style>
 </head>
+
 <body>
 
 <div id="rollWatermark" aria-hidden="true">
     <div class="watermark-text" id="watermarkText"></div>
 </div>
 
+<!-- STUDENT REGISTRATION -->
 <div id="registrationPage">
     <div class="registration-box">
         <h1>Online Assessment</h1>
         <p>Candidate Registration</p>
 
+        <div class="schedule-box" role="status" aria-live="polite">
+            <h2>Assessment Schedule</h2>
+            <p><strong>Date:</strong> 10 November 2026</p>
+            <p><strong>Time:</strong> 04:00 PM</p>
+            <p><strong>Registration Window is Open For:</strong> 15 Minutes</p>
+            <p id="assessmentCountdown">Checking assessment schedule...</p>
+        </div>
+
         <div id="errorMessage" class="error">Please fill all details.</div>
 
         <div class="form-group">
             <label for="studentName">Full Name</label>
-         <input type="text" id="studentName" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
-
+            <input type="text" id="studentName"
+            oninput="this.value=this.value.replace(/[^A-Za-z\s]/g,'')">
         </div>
 
         <div class="form-group">
             <label for="rollNumber">Roll Number</label>
             <input type="number" id="rollNumber" inputmode="numeric" pattern="[0-9]*">
-
         </div>
 
         <div class="form-group">
@@ -158,30 +184,39 @@ body.test-active #testPage img {
         <div class="photo-box">
             <strong>Student Photo (Required)</strong>
             <p class="photo-message">Open the camera and take your photo before starting the test.</p>
+
             <video id="cameraVideo" autoplay playsinline style="display:none;"></video>
             <canvas id="photoCanvas" width="640" height="480" style="display:none;"></canvas>
             <img id="photoPreview" alt="Captured student photo" style="display:none;">
+
             <div class="photo-actions">
                 <button type="button" id="openCameraBtn">Open Camera</button>
                 <button type="button" id="capturePhotoBtn" style="display:none;">Take Photo</button>
                 <button type="button" id="retakePhotoBtn" style="display:none;">Retake Photo</button>
             </div>
+
             <div id="photoMessage" class="photo-message" role="status"></div>
         </div>
 
-        <button class="start-btn" onclick="startTest()">Start Test →</button>
-        <button type="button" class="admin-entry-btn" onclick="showAdminLogin()">Admin Login</button>
+        <button id="startTestBtn" class="start-btn"
+        onclick="startTest()" disabled>Start Test →</button>
+
+        <button type="button" class="admin-entry-btn"
+        onclick="showAdminLogin()">Admin Login</button>
     </div>
 </div>
 
+<!-- SCREENSHOT WARNING -->
 <div id="screenshotWarning" style="display:none;position:fixed;inset:0;background:rgba(23,43,77,.97);color:white;z-index:100000;align-items:center;justify-content:center;text-align:center;padding:30px;">
     <div class="warning-box">
         <h2 style="color:#ff5252;">Screenshot Restricted</h2>
         <p>Screen capture is not permitted during this assessment. Please return to the test.</p>
-        <button class="fullscreen-btn" type="button" onclick="dismissScreenshotWarning()">Return to Test</button>
+        <button class="fullscreen-btn" type="button"
+        onclick="dismissScreenshotWarning()">Return to Test</button>
     </div>
 </div>
 
+<!-- FULLSCREEN WARNING -->
 <div id="fullscreenWarning">
     <div class="warning-box">
         <h2>⚠️ Full-Screen Mode Required</h2>
@@ -191,10 +226,11 @@ body.test-active #testPage img {
     </div>
 </div>
 
+<!-- TEST PAGE -->
 <div id="testPage">
     <div class="header">
         <div class="logo">ONLINE ASSESSMENT</div>
-        <div class="timer">⏱ <span id="timer">05:00</span></div>
+        <div class="timer">⏱ <span id="timer">15:00</span></div>
     </div>
 
     <div class="main">
@@ -202,7 +238,8 @@ body.test-active #testPage img {
             <div class="candidate">
                 <div>Candidate</div>
                 <div style="text-align:center;margin:12px 0;">
-                    <img id="candidatePhoto" alt="Candidate photo" style="display:none;width:100px;height:100px;object-fit:cover;border-radius:50%;border:3px solid #31558a;">
+                    <img id="candidatePhoto" alt="Candidate photo"
+                    style="display:none;width:100px;height:100px;object-fit:cover;border-radius:50%;border:3px solid #31558a;">
                 </div>
                 <div class="candidate-name" id="displayName"></div>
                 <div class="roll" id="displayRoll"></div>
@@ -211,6 +248,7 @@ body.test-active #testPage img {
 
             <div class="section-title">Test Section</div>
             <div class="section active">Python</div>
+
             <div class="section-title">Question Palette</div>
             <div class="palette" id="palette"></div>
 
@@ -223,8 +261,9 @@ body.test-active #testPage img {
 
         <main class="content">
             <div class="top-info">
-                <span>Section: <strong>Python </strong></span>
-                <span>Question <strong id="questionNumber">1</strong> of <strong id="totalQuestions">10</strong></span>
+                <span>Section: <strong>Python</strong></span>
+                <span>Question <strong id="questionNumber">1</strong> of
+                <strong id="totalQuestions">25</strong></span>
             </div>
 
             <div class="question-card">
@@ -247,6 +286,7 @@ body.test-active #testPage img {
     </div>
 </div>
 
+<!-- SUBMISSION MESSAGE -->
 <div id="submissionMessage" class="submission-message" style="display:none;">
     <div class="submission-card">
         <h1>Test Submitted Successfully</h1>
@@ -255,237 +295,502 @@ body.test-active #testPage img {
     </div>
 </div>
 
+<!-- ADMIN LOGIN -->
 <div id="adminLoginPage" class="admin-page" style="display:none;">
     <div class="admin-card">
         <h1>Administrator Login</h1>
         <p>Sign in to view assessment results.</p>
+
         <div id="adminLoginError" class="error"></div>
+
         <div class="form-group">
             <label for="adminUsername">Username</label>
-            <input id="adminUsername" type="text" autocomplete="username" placeholder="Enter username">
+            <input id="adminUsername" type="text"
+            autocomplete="username" placeholder="Enter username">
         </div>
+
         <div class="form-group">
             <label for="adminPassword">Password</label>
-            <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Enter password">
+            <input id="adminPassword" type="password"
+            autocomplete="current-password" placeholder="Enter password">
         </div>
+
         <button class="start-btn" onclick="adminLogin()">Login</button>
         <button class="admin-entry-btn" onclick="backToRegistration()">Back to Registration</button>
     </div>
 </div>
 
+<!-- ADMIN DASHBOARD -->
 <div id="adminDashboard" class="admin-page" style="display:none;">
     <div class="admin-dashboard">
         <div class="admin-header">
             <h1>Assessment Results</h1>
             <button class="logout-btn" onclick="adminLogout()">Logout</button>
         </div>
+
         <p class="admin-note">Results are saved in this browser only. Export a backup regularly.</p>
+
         <div class="admin-actions">
-            <button class="start-btn" style="width:auto;" onclick="exportResultsCSV()">Export Results CSV</button>
-            <button class="delete-results-btn" onclick="clearAllResults()">Delete All Results</button>
+            <button class="start-btn" style="width:auto;"
+            onclick="exportResultsCSV()">Export Results CSV</button>
+
+            <button class="delete-results-btn"
+            onclick="clearAllResults()">Delete All Results</button>
         </div>
+
         <div id="adminResults"></div>
     </div>
 </div>
 
 <script>
+
+// =============================================
+// QUESTION BANK - 25 QUESTIONS
+// =============================================
+
 const questions = [
+
+    // Python Functions (Q1–Q7)
+
     {
-        question: "What is the full form of OOP?",
-        options: [
-            "Object-Oriented Programming",
-            "Object Operating Program",
-            "Oriented Object Process",
-            "Open Object Programming"
-        ],
+        question: "Which keyword is used to define a function in Python?",
+        options: ["function", "def", "fun", "define"],
+        answer: 1
+    },
+    {
+        question: "Which keyword is used to return a value from a function?",
+        options: ["print", "break", "return", "pass"],
+        answer: 2
+    },
+    {
+        question: "What will be the output of the following code?\n\ndef add(a, b):\n    return a + b\nprint(add(10, 20))",
+        options: ["10", "20", "30", "1020"],
+        answer: 2
+    },
+    {
+        question: "What does a Python function return if no return statement is specified?",
+        options: ["0", "False", "None", "Error"],
+        answer: 2
+    },
+    {
+        question: "Which parameter is used to accept a variable number of positional arguments?",
+        options: ["*args", "**kwargs", "args[]", "var"],
         answer: 0
     },
     {
+        question: "Which parameter is used to accept a variable number of keyword arguments?",
+        options: ["*args", "**kwargs", "kwargs[]", "key"],
+        answer: 1
+    },
+    {
+        question: "What will be the output of the following code?\n\ndef greet(name='Student'):\n    print('Hello', name)\ngreet()",
+        options: ["Hello", "Hello Student", "Student", "Error"],
+        answer: 1
+    },
+
+    // Python Classes and Objects (Q8–Q15)
+
+    {
         question: "Which keyword is used to define a class in Python?",
-        options: ["object", "class", "define", "struct"],
+        options: ["def", "object", "class", "struct"],
         answer: 2
     },
     {
         question: "What is an object in Python?",
-        options: [
-            "A loop",
-            "A function only",
-            "An instance of a class",
-            "A module"
-        ],
-        answer: 3
+        options: ["A function", "An instance of a class", "A loop", "A module"],
+        answer: 1
     },
     {
         question: "Which method is commonly used as a constructor in Python?",
-        options: [
-            "__start__()",
-            "__main__()",
-            "__create__()",
-            "__init__()"
-        ],
-        answer: 4
+        options: ["__start__()", "__main__()", "__create__()", "__init__()"],
+        answer: 3
     },
     {
-        question: "Which concept allows a class to acquire properties of another class?",
+        question: "What does self represent in a Python class?",
         options: [
-            "Inheritance",
-            "Encapsulation",
-            "Abstraction",
-            "Iteration"
+            "The parent class",
+            "The current object",
+            "A global variable",
+            "A function"
         ],
         answer: 1
     },
     {
-        question: "Which concept allows the same interface to have different implementations?",
+        question: "What will be the output of the following code?\n\nclass Student:\n    def display(self):\n        print('MCA')\ns = Student()\ns.display()",
+        options: ["Student", "display", "MCA", "Error"],
+        answer: 2
+    },
+    {
+        question: "Which operator is used to access the attributes and methods of an object?",
+        options: ["->", ".", "::", "#"],
+        answer: 1
+    },
+    {
+        question: "What will be the output of the following code?\n\nclass Person:\n    def __init__(self, name):\n        self.name = name\np = Person('Prem')\nprint(p.name)",
+        options: ["Person", "name", "Prem", "Error"],
+        answer: 2
+    },
+    {
+        question: "Which function is used to check whether an object belongs to a particular class?",
+        options: ["type()", "check()", "isinstance()", "object()"],
+        answer: 2
+    },
+
+    // Python Single Inheritance (Q16–Q25)
+
+    {
+        question: "What is inheritance in Python?",
         options: [
-            "Inheritance",
-            "Polymorphism",
-            "Compilation",
-            "Iteration"
+            "Creating a loop",
+            "Acquiring properties and methods of another class",
+            "Defining a function",
+            "Creating a variable"
+        ],
+        answer: 1
+    },
+    {
+        question: "What is single inheritance?",
+        options: [
+            "One class inherits from one parent class",
+            "One class inherits from multiple classes",
+            "Multiple classes inherit from one class",
+            "A class inherits from itself"
+        ],
+        answer: 0
+    },
+    {
+        question: "Which function is commonly used to call the parent class constructor?",
+        options: ["parent()", "this()", "super()", "base()"],
+        answer: 2
+    },
+    {
+        question: "What will be the output of the following code?\n\nclass A:\n    def show(self):\n        print('Parent Class')\nclass B(A):\n    pass\nobj = B()\nobj.show()",
+        options: ["Child Class", "Parent Class", "B", "Error"],
+        answer: 1
+    },
+    {
+        question: "In the code class Dog(Animal), which class is the parent class?",
+        options: ["Dog", "Animal", "Both", "None"],
+        answer: 1
+    },
+    {
+        question: "What is one major advantage of inheritance?",
+        options: [
+            "Code reusability",
+            "Code duplication",
+            "Slower execution",
+            "Memory wastage"
+        ],
+        answer: 0
+    },
+    {
+        question: "What will be the output of the following code?\n\nclass Human:\n    def __init__(self):\n        self.eyes = 2\nclass Male(Human):\n    pass\nm = Male()\nprint(m.eyes)",
+        options: ["0", "1", "2", "Error"],
+        answer: 2
+    },
+    {
+        question: "Which is the correct syntax for single inheritance in Python?",
+        options: [
+            "class B inherits A:",
+            "class B(A):",
+            "class B extends A:",
+            "class B -> A:"
+        ],
+        answer: 1
+    },
+    {
+        question: "What is method overriding in Python?",
+        options: [
+            "Defining a new variable",
+            "Calling a function repeatedly",
+            "Redefining a parent class method in the child class",
+            "Deleting a parent class"
         ],
         answer: 2
     },
     {
-        question: "Which OOP concept bundles data and methods together?",
-        options: [
-            "Abstraction",
-            "Polymorphism",
-            "Encapsulation",
-            "Recursion"
-        ],
-        answer: 3
-    },
-    {
-        question: "Which concept hides implementation details and exposes essential features?",
-        options: [
-            "Inheritance",
-            "Iteration",
-            "Overloading",
-            "Abstraction"
-        ],
-        answer: 4
-    },
-    {
-        question: "Which parameter refers to the current object inside an instance method?",
-        options: [
-            "self",
-            "this",
-            "current",
-            "object"
-        ],
+        question: "What will be the output of the following code?\n\nclass A:\n    def show(self):\n        print('Class A')\nclass B(A):\n    def show(self):\n        print('Class B')\nobj = B()\nobj.show()",
+        options: ["Class A", "Class B", "A", "Error"],
         answer: 1
-    },
-    {
-        question: "How do you create an object of a class named Student?",
-        options: [
-            "object Student",
-            "Student = class",
-            "Student()",
-            "new Student"
-        ],
-        answer: 3
     }
 ];
+
+
+// =============================================
+// GLOBAL VARIABLES
+// =============================================
+
 let studentName = "";
 let rollNumber = "";
 let studentSection = "";
+
 let currentQuestion = 0;
 let answers = [];
 let reviewQuestions = [];
-let timeLeft = 01 * 60;
-let timer;
+
+let timeLeft = 15 * 60;
+let timer = null;
+
 let testStarted = false;
 let testSubmitted = false;
+
 let capturedPhotoData = null;
 let cameraStream = null;
 
+
+// =============================================
+// ASSESSMENT SCHEDULE
+// =============================================
+
+// Assessment opens on 09 November 2026 at 04:00 PM.
+// JavaScript month is zero-based: 10 = November.
+
+const assessmentStartTime =
+    new Date(2026, 10, 09, 19, 50, 0).getTime();
+
+// Registration window: 15 minutes.
+const registrationDuration = 15 * 60 * 1000;
+
+// Registration closing time.
+const assessmentEndTime =
+    assessmentStartTime + registrationDuration;
+
+
+// =============================================
+// UPDATE ASSESSMENT SCHEDULE
+// =============================================
+
+function updateAssessmentSchedule() {
+
+    const now = Date.now();
+
+    const countdown =
+        document.getElementById("assessmentCountdown");
+
+    const startButton =
+        document.getElementById("startTestBtn");
+
+    // Before scheduled opening time.
+    if (now < assessmentStartTime) {
+
+        const remaining = assessmentStartTime - now;
+
+        const days = Math.floor(
+            remaining / (1000 * 60 * 60 * 24)
+        );
+
+        const hours = Math.floor(
+            (remaining % (1000 * 60 * 60 * 24)) /
+            (1000 * 60 * 60)
+        );
+
+        const minutes = Math.floor(
+            (remaining % (1000 * 60 * 60)) / (1000 * 60)
+        );
+
+        const seconds = Math.floor(
+            (remaining % (1000 * 60)) / 1000
+        );
+
+        countdown.textContent =
+            "Test starts in: " +
+            days + "d " +
+            hours + "h " +
+            minutes + "m " +
+            seconds + "s";
+
+        startButton.disabled = true;
+        startButton.textContent = "Test Not Started";
+
+    }
+
+    // Registration is open for 15 minutes.
+    else if (now < assessmentEndTime) {
+
+        const remaining = assessmentEndTime - now;
+
+        const minutes = Math.floor(remaining / 60000);
+
+        const seconds = Math.floor(
+            (remaining % 60000) / 1000
+        );
+
+        countdown.textContent =
+            "Assessment Open! Registration closes in: " +
+            minutes + "m " + seconds + "s";
+
+        startButton.disabled = false;
+        startButton.textContent = "Start Test →";
+
+    }
+
+    // Registration time has expired.
+    else {
+
+        countdown.textContent = "No Test Scheduled";
+
+        startButton.disabled = true;
+        startButton.textContent = "Registration Closed";
+
+        stopStudentCamera();
+
+        document.getElementById("photoMessage").textContent =
+            "Registration time has expired.";
+    }
+}
+
+updateAssessmentSchedule();
+
+setInterval(updateAssessmentSchedule, 1000);
+
+
+// =============================================
+// CAMERA FUNCTIONS
+// =============================================
+
 async function openStudentCamera() {
+
     const video = document.getElementById("cameraVideo");
+
     const message = document.getElementById("photoMessage");
 
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        message.textContent = "Camera access requires HTTPS or localhost in a supported browser.";
+    if (!navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia) {
+
+        message.textContent =
+            "Camera access requires HTTPS or localhost in a supported browser.";
+
         return;
     }
 
     try {
+
         stopStudentCamera();
+
         cameraStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: "user" },
             audio: false
         });
 
         video.srcObject = cameraStream;
+
         video.style.display = "block";
+
         document.getElementById("photoPreview").style.display = "none";
+
         document.getElementById("capturePhotoBtn").style.display = "inline-block";
+
         document.getElementById("retakePhotoBtn").style.display = "none";
-        message.textContent = "Camera ready. Please take your photo.";
+
+        message.textContent =
+            "Camera ready. Please take your photo.";
+
     } catch (error) {
-        message.textContent = "Unable to access the camera. Please allow camera permission and try again.";
+
+        message.textContent =
+            "Unable to access the camera. Please allow camera permission and try again.";
     }
 }
 
 function stopStudentCamera() {
+
     if (cameraStream) {
+
         cameraStream.getTracks().forEach(function(track) {
             track.stop();
         });
+
         cameraStream = null;
     }
 
     const video = document.getElementById("cameraVideo");
-    if (video) video.srcObject = null;
+
+    if (video) {
+        video.srcObject = null;
+    }
 }
 
 function captureStudentPhoto() {
+
     const video = document.getElementById("cameraVideo");
 
     if (!cameraStream || !video.videoWidth) {
-        document.getElementById("photoMessage").textContent = "Please open the camera and wait until the video appears.";
+
+        document.getElementById("photoMessage").textContent =
+            "Please open the camera and wait until the video appears.";
+
         return;
     }
 
     const canvas = document.getElementById("photoCanvas");
+
     const context = canvas.getContext("2d");
+
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
     capturedPhotoData = canvas.toDataURL("image/jpeg", 0.9);
 
     const preview = document.getElementById("photoPreview");
+
     preview.src = capturedPhotoData;
+
     preview.style.display = "block";
 
     video.style.display = "none";
+
     document.getElementById("capturePhotoBtn").style.display = "none";
+
     document.getElementById("retakePhotoBtn").style.display = "inline-block";
-    document.getElementById("photoMessage").textContent = "Photo captured. You can retake it or start the test.";
+
+    document.getElementById("photoMessage").textContent =
+        "Photo captured. You can retake it or start the test.";
 
     stopStudentCamera();
 }
 
-document.getElementById("openCameraBtn").addEventListener("click", openStudentCamera);
-document.getElementById("capturePhotoBtn").addEventListener("click", captureStudentPhoto);
-document.getElementById("retakePhotoBtn").addEventListener("click", openStudentCamera);
+document.getElementById("openCameraBtn")
+    .addEventListener("click", openStudentCamera);
+
+document.getElementById("capturePhotoBtn")
+    .addEventListener("click", captureStudentPhoto);
+
+document.getElementById("retakePhotoBtn")
+    .addEventListener("click", openStudentCamera);
+
+
+// =============================================
+// FULLSCREEN FUNCTIONS
+// =============================================
 
 function requestFullScreen() {
+
     const element = document.documentElement;
 
     if (element.requestFullscreen) {
+
         element.requestFullscreen().catch(function(error) {
             console.log("Full-screen request failed:", error);
         });
+
     } else if (element.webkitRequestFullscreen) {
+
         element.webkitRequestFullscreen();
+
     } else if (element.msRequestFullscreen) {
+
         element.msRequestFullscreen();
     }
 }
 
 function checkFullScreen() {
+
     if (!testStarted || testSubmitted) return;
 
-    const warning = document.getElementById("fullscreenWarning");
-    const isFullScreen = document.fullscreenElement ||
+    const warning =
+        document.getElementById("fullscreenWarning");
+
+    const isFullScreen =
+        document.fullscreenElement ||
         document.webkitFullscreenElement ||
         document.msFullscreenElement;
 
@@ -493,154 +798,282 @@ function checkFullScreen() {
 }
 
 document.addEventListener("fullscreenchange", checkFullScreen);
+
 document.addEventListener("webkitfullscreenchange", checkFullScreen);
 
+
+// =============================================
+// DISABLE SOME BROWSER ACTIONS
+// =============================================
+
 ["contextmenu", "copy", "cut", "paste"].forEach(function(eventName) {
+
     document.addEventListener(eventName, function(event) {
-        if (testStarted && !testSubmitted) event.preventDefault();
+
+        if (testStarted && !testSubmitted) {
+            event.preventDefault();
+        }
+
     });
+
 });
 
 document.addEventListener("keydown", function(event) {
+
     if (!testStarted || testSubmitted) return;
 
     const key = event.key.toLowerCase();
 
-    // Block common copy, cut, paste, select-all, print/save, view-source and developer-tools shortcuts.
     if (
         (event.ctrlKey && ["c", "v", "x", "a", "u", "p", "s"].includes(key)) ||
         (event.metaKey && ["c", "v", "x", "a", "p", "s"].includes(key)) ||
         event.key === "F12" ||
         (event.ctrlKey && event.shiftKey && ["i", "j", "c"].includes(key))
     ) {
+
         event.preventDefault();
         event.stopPropagation();
     }
 
-    // Best-effort browser deterrent for Print Screen; native OS screenshots cannot be reliably blocked.
     if (event.key === "PrintScreen") {
+
         event.preventDefault();
+
         showScreenshotWarning();
+
         try {
+
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText("").catch(function() {});
             }
+
         } catch (error) {}
     }
+
 });
 
 function showScreenshotWarning() {
+
     if (!testStarted || testSubmitted) return;
+
     document.getElementById("screenshotWarning").style.display = "flex";
 }
 
 function dismissScreenshotWarning() {
+
     document.getElementById("screenshotWarning").style.display = "none";
 }
 
-function startTest() {
-    studentName = document.getElementById("studentName").value.trim();
-    rollNumber = document.getElementById("rollNumber").value.trim();
-    studentSection = document.getElementById("studentSection").value;
 
-    const error = document.getElementById("errorMessage");
+// =============================================
+// START TEST
+// =============================================
+
+function startTest() {
+
+    const now = Date.now();
+
+    // Do not allow starting before schedule.
+    if (now < assessmentStartTime) {
+
+        alert("The assessment has not started yet.");
+
+        return;
+    }
+
+    // Do not allow starting after 15 minutes.
+    if (now >= assessmentEndTime) {
+
+        document.getElementById("assessmentCountdown").textContent =
+            "No Test Scheduled";
+
+        document.getElementById("startTestBtn").disabled = true;
+
+        alert("No Test Scheduled. Registration time has expired.");
+
+        return;
+    }
+
+    studentName =
+        document.getElementById("studentName").value.trim();
+
+    rollNumber =
+        document.getElementById("rollNumber").value.trim();
+
+    studentSection =
+        document.getElementById("studentSection").value;
+
+    const error =
+        document.getElementById("errorMessage");
 
     if (!studentName || !rollNumber || !studentSection) {
+
         error.textContent = "Please fill all details.";
+
         error.style.display = "block";
+
         return;
     }
 
     if (!capturedPhotoData) {
-        error.textContent = "Please take your photo before starting the test.";
+
+        error.textContent =
+            "Please take your photo before starting the test.";
+
         error.style.display = "block";
-        document.getElementById("photoMessage").textContent = "A student photo is required before the test can start.";
+
+        document.getElementById("photoMessage").textContent =
+            "A student photo is required before the test can start.";
+
         return;
     }
 
     error.style.display = "none";
+
     stopStudentCamera();
 
-    const candidatePhoto = document.getElementById("candidatePhoto");
+    const candidatePhoto =
+        document.getElementById("candidatePhoto");
+
     candidatePhoto.src = capturedPhotoData;
+
     candidatePhoto.style.display = "inline-block";
 
-    document.getElementById("displayName").textContent = studentName;
-    document.getElementById("displayRoll").textContent = "Roll No: " + rollNumber;
-    document.getElementById("displaySection").textContent = "Section: " + studentSection;
+    document.getElementById("displayName").textContent =
+        studentName;
 
-    const watermarkText = document.getElementById("watermarkText");
+    document.getElementById("displayRoll").textContent =
+        "Roll No: " + rollNumber;
+
+    document.getElementById("displaySection").textContent =
+        "Section: " + studentSection;
+
+    // Roll number watermark.
+    const watermarkText =
+        document.getElementById("watermarkText");
+
     watermarkText.innerHTML = "";
 
     for (let i = 0; i < 50; i++) {
+
         const span = document.createElement("span");
+
         span.textContent = rollNumber;
+
         watermarkText.appendChild(span);
     }
 
     document.getElementById("rollWatermark").style.display = "block";
 
     currentQuestion = 0;
+
     answers = new Array(questions.length).fill(null);
+
     reviewQuestions = new Array(questions.length).fill(false);
-    timeLeft = 05* 60;
+
+    // Test duration: 15 minutes.
+    timeLeft = 15 * 60;
+
     testStarted = true;
+
     testSubmitted = false;
+
     document.body.classList.add("test-active");
 
-    document.getElementById("totalQuestions").textContent = questions.length;
+    document.getElementById("totalQuestions").textContent =
+        questions.length;
+
     createPalette();
 
     document.getElementById("registrationPage").style.display = "none";
+
     document.getElementById("testPage").style.display = "block";
 
     showQuestion();
+
     startTimer();
+
     requestFullScreen();
 }
 
+
+// =============================================
+// QUESTION PALETTE
+// =============================================
+
 function createPalette() {
+
     const palette = document.getElementById("palette");
+
     palette.innerHTML = "";
 
     questions.forEach(function(_, index) {
+
         const button = document.createElement("button");
+
         button.textContent = index + 1;
+
         button.onclick = function() {
+
             currentQuestion = index;
+
             showQuestion();
         };
+
         palette.appendChild(button);
     });
 }
 
+
+// =============================================
+// DISPLAY QUESTION
+// =============================================
+
 function showQuestion() {
+
     const q = questions[currentQuestion];
 
-    document.getElementById("questionNumber").textContent = currentQuestion + 1;
-    document.getElementById("qNo").textContent = currentQuestion + 1;
-    document.getElementById("question").textContent = q.question;
+    document.getElementById("questionNumber").textContent =
+        currentQuestion + 1;
+
+    document.getElementById("qNo").textContent =
+        currentQuestion + 1;
+
+    document.getElementById("question").textContent =
+        q.question;
 
     const options = document.getElementById("options");
+
     options.innerHTML = "";
 
     q.options.forEach(function(option, index) {
+
         const label = document.createElement("label");
+
         label.className = "option";
 
         const radio = document.createElement("input");
+
         radio.type = "radio";
+
         radio.name = "answer";
+
         radio.checked = answers[currentQuestion] === index;
 
         const text = document.createTextNode(option);
+
         label.appendChild(radio);
+
         label.appendChild(text);
 
-        if (radio.checked) label.classList.add("selected");
+        if (radio.checked) {
+            label.classList.add("selected");
+        }
 
         label.onclick = function() {
+
             answers[currentQuestion] = index;
+
             showQuestion();
         };
 
@@ -650,59 +1083,106 @@ function showQuestion() {
     updatePalette();
 }
 
+
+// =============================================
+// UPDATE QUESTION PALETTE
+// =============================================
+
 function updatePalette() {
-    document.querySelectorAll(".palette button").forEach(function(button, index) {
+
+    document.querySelectorAll(".palette button")
+        .forEach(function(button, index) {
+
         button.className = "";
 
-        if (answers[index] !== null) button.classList.add("answered");
-        if (reviewQuestions[index]) button.classList.add("review");
-        if (index === currentQuestion) button.classList.add("current");
+        if (answers[index] !== null) {
+            button.classList.add("answered");
+        }
+
+        if (reviewQuestions[index]) {
+            button.classList.add("review");
+        }
+
+        if (index === currentQuestion) {
+            button.classList.add("current");
+        }
+
     });
 }
 
+
+// =============================================
+// QUESTION NAVIGATION
+// =============================================
+
 function nextQuestion() {
+
     if (currentQuestion < questions.length - 1) {
+
         currentQuestion++;
+
         showQuestion();
     }
 }
 
 function previousQuestion() {
+
     if (currentQuestion > 0) {
+
         currentQuestion--;
+
         showQuestion();
     }
 }
 
 function markReview() {
-    reviewQuestions[currentQuestion] = !reviewQuestions[currentQuestion];
+
+    reviewQuestions[currentQuestion] =
+        !reviewQuestions[currentQuestion];
+
     updatePalette();
 }
 
 function clearAnswer() {
+
     answers[currentQuestion] = null;
+
     showQuestion();
 }
 
+
+// =============================================
+// TEST TIMER
+// =============================================
+
 function startTimer() {
+
     clearInterval(timer);
 
     timer = setInterval(function() {
+
         timeLeft--;
+
         updateTimer();
 
         if (timeLeft <= 0) {
+
             clearInterval(timer);
+
             alert("Time is over. Your test will be submitted automatically.");
+
             submitTest(true);
         }
+
     }, 1000);
 
     updateTimer();
 }
 
 function updateTimer() {
+
     const minutes = Math.floor(timeLeft / 60);
+
     const seconds = timeLeft % 60;
 
     document.getElementById("timer").textContent =
@@ -710,42 +1190,69 @@ function updateTimer() {
         String(seconds).padStart(2, "0");
 }
 
+
+// =============================================
+// SUBMIT TEST
+// =============================================
+
 function submitTest(automatic = false) {
+
     if (testSubmitted) return;
 
-    if (!automatic && !confirm("Are you sure you want to submit the test?")) {
+    if (!automatic &&
+        !confirm("Are you sure you want to submit the test?")) {
+
         return;
     }
 
     testSubmitted = true;
+
     testStarted = false;
+
     clearInterval(timer);
 
     document.getElementById("fullscreenWarning").style.display = "none";
+
     document.getElementById("screenshotWarning").style.display = "none";
+
     document.body.classList.remove("test-active");
+
     document.getElementById("rollWatermark").style.display = "none";
 
     let correct = 0;
+
     let wrong = 0;
+
     let attempted = 0;
+
     let notAttempted = 0;
 
     const answerDetails = questions.map(function(question, index) {
+
         const selected = answers[index];
+
         let status;
 
         if (selected === null) {
+
             notAttempted++;
+
             status = "Not Attempted";
+
         } else {
+
             attempted++;
 
             if (selected === question.answer) {
+
                 correct++;
+
                 status = "Correct";
+
             } else {
+
                 wrong++;
+
                 status = "Wrong";
             }
         }
@@ -754,7 +1261,8 @@ function submitTest(automatic = false) {
             question: question.question,
             options: question.options,
             selectedIndex: selected,
-            selectedAnswer: selected === null ? "Not Attempted" : question.options[selected],
+            selectedAnswer: selected === null ?
+                "Not Attempted" : question.options[selected],
             correctIndex: question.answer,
             correctAnswer: question.options[question.answer],
             status: status
@@ -762,133 +1270,267 @@ function submitTest(automatic = false) {
     });
 
     const resultRecord = {
+
         id: String(Date.now()) + "-" + rollNumber,
+
         name: studentName,
+
         rollNumber: rollNumber,
+
         section: studentSection,
+
         photo: capturedPhotoData,
+
         total: questions.length,
+
         attempted: attempted,
+
         correct: correct,
+
         wrong: wrong,
+
         notAttempted: notAttempted,
-        percentage: Number(((correct / questions.length) * 100).toFixed(2)),
+
+        percentage: Number(
+            ((correct / questions.length) * 100).toFixed(2)
+        ),
+
         submittedAt: new Date().toLocaleString(),
+
         answers: answerDetails
     };
 
     try {
-        const savedResults = JSON.parse(localStorage.getItem("onlineAssessmentResults") || "[]");
+
+        const savedResults = JSON.parse(
+            localStorage.getItem("onlineAssessmentResults") || "[]"
+        );
+
         savedResults.push(resultRecord);
-        localStorage.setItem("onlineAssessmentResults", JSON.stringify(savedResults));
+
+        localStorage.setItem(
+            "onlineAssessmentResults",
+            JSON.stringify(savedResults)
+        );
+
     } catch (error) {
-        alert("The result could not be saved in this browser. Storage may be full. Please contact the administrator.");
+
+        alert(
+            "The result could not be saved in this browser. Storage may be full. Please contact the administrator."
+        );
+
         testSubmitted = false;
+
         testStarted = true;
+
         return;
     }
 
     document.getElementById("testPage").style.display = "none";
+
     document.getElementById("registrationPage").style.display = "none";
+
     document.getElementById("submissionMessage").style.display = "flex";
 
     if (document.fullscreenElement && document.exitFullscreen) {
+
         document.exitFullscreen().catch(function() {});
     }
 
     window.scrollTo(0, 0);
 }
 
+
+// =============================================
+// ADMIN LOGIN PAGE
+// =============================================
+
 function showAdminLogin() {
+
     stopStudentCamera();
+
     document.getElementById("registrationPage").style.display = "none";
+
     document.getElementById("testPage").style.display = "none";
+
     document.getElementById("submissionMessage").style.display = "none";
+
     document.getElementById("adminDashboard").style.display = "none";
+
     document.getElementById("adminLoginPage").style.display = "flex";
+
     document.getElementById("adminLoginError").style.display = "none";
 }
 
 function backToRegistration() {
+
     document.getElementById("adminLoginPage").style.display = "none";
+
     document.getElementById("registrationPage").style.display = "flex";
+
+    updateAssessmentSchedule();
 }
 
+
+// =============================================
+// ADMIN LOGIN AUTHENTICATION
+// =============================================
+
 async function adminLogin() {
-    const username = document.getElementById("adminUsername").value.trim();
-    const password = document.getElementById("adminPassword").value;
-    const error = document.getElementById("adminLoginError");
-    const storedPasswordHash = "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5";
 
-    // Standard browser Web Crypto API implementation to calculate the SHA-256 hash
-    const msgBuffer = new TextEncoder().encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const computedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const username =
+        document.getElementById("adminUsername").value.trim();
 
-    if (username === "admin" && computedHash === storedPasswordHash)  {
-        document.getElementById("adminLoginPage").style.display = "none";
-        document.getElementById("adminDashboard").style.display = "flex";
-        document.getElementById("adminPassword").value = "";
-        renderAdminResults();
-    } else {
-        error.textContent = "Incorrect username or password.";
+    const password =
+        document.getElementById("adminPassword").value;
+
+    const error =
+        document.getElementById("adminLoginError");
+
+    const storedPasswordHash =
+        "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5";
+
+    try {
+
+        const msgBuffer = new TextEncoder().encode(password);
+
+        const hashBuffer =
+            await crypto.subtle.digest("SHA-256", msgBuffer);
+
+        const hashArray =
+            Array.from(new Uint8Array(hashBuffer));
+
+        const computedHash =
+            hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+        if (username === "admin" &&
+            computedHash === storedPasswordHash) {
+
+            document.getElementById("adminLoginPage").style.display = "none";
+
+            document.getElementById("adminDashboard").style.display = "flex";
+
+            document.getElementById("adminPassword").value = "";
+
+            renderAdminResults();
+
+        } else {
+
+            error.textContent = "Incorrect username or password.";
+
+            error.style.display = "block";
+        }
+
+    } catch (err) {
+
+        error.textContent =
+            "Admin login requires a supported secure browser context.";
+
         error.style.display = "block";
     }
 }
 
 
+// =============================================
+// ADMIN LOGOUT
+// =============================================
+
 function adminLogout() {
+
     document.getElementById("adminDashboard").style.display = "none";
+
     document.getElementById("adminLoginPage").style.display = "flex";
+
     document.getElementById("adminUsername").value = "";
+
     document.getElementById("adminPassword").value = "";
 }
 
+
+// =============================================
+// DISPLAY ADMIN RESULTS
+// =============================================
+
 function renderAdminResults() {
-    const container = document.getElementById("adminResults");
+
+    const container =
+        document.getElementById("adminResults");
+
     let results = [];
 
     try {
-        results = JSON.parse(localStorage.getItem("onlineAssessmentResults") || "[]");
+
+        results = JSON.parse(
+            localStorage.getItem("onlineAssessmentResults") || "[]"
+        );
+
     } catch (error) {
+
         results = [];
     }
 
     container.innerHTML = "";
 
     if (!results.length) {
-        container.textContent = "No assessment results have been saved in this browser yet.";
+
+        container.textContent =
+            "No assessment results have been saved in this browser yet.";
+
         return;
     }
 
     const wrapper = document.createElement("div");
+
     wrapper.className = "admin-table-wrap";
 
     const table = document.createElement("table");
+
     table.className = "admin-table";
 
     const thead = document.createElement("thead");
-    thead.innerHTML = "<tr><th>Photo</th><th>Name</th><th>Roll Number</th><th>Section</th><th>Score</th><th>Correct</th><th>Wrong</th><th>Submitted</th><th>Details</th></tr>";
+
+    thead.innerHTML =
+        "<tr>" +
+        "<th>Photo</th>" +
+        "<th>Name</th>" +
+        "<th>Roll Number</th>" +
+        "<th>Section</th>" +
+        "<th>Score</th>" +
+        "<th>Correct</th>" +
+        "<th>Wrong</th>" +
+        "<th>Submitted</th>" +
+        "<th>Details</th>" +
+        "</tr>";
+
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
 
     results.slice().reverse().forEach(function(result) {
+
         const tr = document.createElement("tr");
+
         const photoCell = document.createElement("td");
 
         if (result.photo) {
+
             const img = document.createElement("img");
+
             img.src = result.photo;
+
             img.alt = "Student photo";
+
             img.className = "admin-photo";
+
             photoCell.appendChild(img);
+
         } else {
+
             photoCell.textContent = "No photo";
         }
 
         const values = [
+
             result.name,
             result.rollNumber,
             result.section,
@@ -896,58 +1538,91 @@ function renderAdminResults() {
             result.correct,
             result.wrong,
             result.submittedAt
+
         ];
 
         tr.appendChild(photoCell);
 
         values.forEach(function(value) {
+
             const td = document.createElement("td");
+
             td.textContent = value == null ? "" : String(value);
+
             tr.appendChild(td);
         });
 
         const actionCell = document.createElement("td");
+
         const detailsButton = document.createElement("button");
+
         detailsButton.className = "details-btn";
+
         detailsButton.textContent = "View Answers";
+
         detailsButton.onclick = function() {
+
             showResultDetails(result.id);
         };
 
         actionCell.appendChild(detailsButton);
+
         tr.appendChild(actionCell);
+
         tbody.appendChild(tr);
     });
 
     table.appendChild(tbody);
+
     wrapper.appendChild(table);
+
     container.appendChild(wrapper);
 
     const detailsContainer = document.createElement("div");
+
     detailsContainer.id = "resultDetailsContainer";
+
     container.appendChild(detailsContainer);
 }
 
+
+// =============================================
+// VIEW STUDENT ANSWER DETAILS
+// =============================================
+
 function showResultDetails(resultId) {
-    const results = JSON.parse(localStorage.getItem("onlineAssessmentResults") || "[]");
+
+    const results = JSON.parse(
+        localStorage.getItem("onlineAssessmentResults") || "[]"
+    );
+
     const result = results.find(function(item) {
         return item.id === resultId;
     });
 
     if (!result) return;
 
-    const container = document.getElementById("resultDetailsContainer");
+    const container =
+        document.getElementById("resultDetailsContainer");
+
     container.innerHTML = "";
 
     const section = document.createElement("section");
+
     section.className = "result-details";
 
     const heading = document.createElement("h2");
-    heading.textContent = "Answer Details — " + result.name + " (" + result.rollNumber + ")";
+
+    heading.textContent =
+        "Answer Details — " + result.name +
+        " (" + result.rollNumber + ")";
+
     section.appendChild(heading);
 
     const summary = document.createElement("p");
-    summary.textContent = "Score: " + result.correct + "/" + result.total +
+
+    summary.textContent =
+        "Score: " + result.correct + "/" + result.total +
         " | Correct: " + result.correct +
         " | Wrong: " + result.wrong +
         " | Not attempted: " + result.notAttempted +
@@ -956,78 +1631,156 @@ function showResultDetails(resultId) {
     section.appendChild(summary);
 
     (result.answers || []).forEach(function(answer, index) {
+
         const card = document.createElement("div");
-        card.className = "admin-answer " +
+
+        card.className =
+            "admin-answer " +
             (answer.status === "Correct" ? "correct" :
             answer.status === "Wrong" ? "wrong" : "unanswered");
 
         const question = document.createElement("h3");
-        question.textContent = "Q" + (index + 1) + ". " + answer.question;
+
+        question.textContent =
+            "Q" + (index + 1) + ". " + answer.question;
 
         const chosen = document.createElement("p");
-        chosen.textContent = "Student answer: " + answer.selectedAnswer;
+
+        chosen.textContent =
+            "Student answer: " + answer.selectedAnswer;
 
         const correctAnswer = document.createElement("p");
-        correctAnswer.textContent = "Correct answer: " + answer.correctAnswer;
+
+        correctAnswer.textContent =
+            "Correct answer: " + answer.correctAnswer;
 
         const status = document.createElement("strong");
+
         status.textContent = answer.status;
 
         card.append(question, chosen, correctAnswer, status);
+
         section.appendChild(card);
     });
 
     container.appendChild(section);
-    section.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    section.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 }
 
+
+// =============================================
+// EXPORT RESULTS TO CSV
+// =============================================
+
 function exportResultsCSV() {
-    const results = JSON.parse(localStorage.getItem("onlineAssessmentResults") || "[]");
+
+    const results = JSON.parse(
+        localStorage.getItem("onlineAssessmentResults") || "[]"
+    );
 
     if (!results.length) {
+
         alert("There are no results to export.");
+
         return;
     }
 
     function csvCell(value) {
-        return '"' + String(value == null ? "" : value).replace(/"/g, '""') + '"';
+
+        return '"' +
+            String(value == null ? "" : value)
+            .replace(/"/g, '""') +
+            '"';
     }
 
     const rows = [
-        ["Name", "Roll Number", "Section", "Score", "Total", "Correct", "Wrong",
-        "Not Attempted", "Percentage", "Submitted At", "Photo Data"]
+
+        [
+            "Name",
+            "Roll Number",
+            "Section",
+            "Score",
+            "Total",
+            "Correct",
+            "Wrong",
+            "Not Attempted",
+            "Percentage",
+            "Submitted At",
+            "Photo Data"
+        ]
+
     ];
 
     results.forEach(function(result) {
+
         rows.push([
-            result.name, result.rollNumber, result.section, result.correct,
-            result.total, result.correct, result.wrong, result.notAttempted,
-            result.percentage, result.submittedAt, result.photo || ""
+
+            result.name,
+            result.rollNumber,
+            result.section,
+            result.correct,
+            result.total,
+            result.correct,
+            result.wrong,
+            result.notAttempted,
+            result.percentage,
+            result.submittedAt,
+            result.photo || ""
+
         ]);
     });
 
     const csv = rows.map(function(row) {
+
         return row.map(csvCell).join(",");
+
     }).join("\r\n");
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(
+        [csv],
+        { type: "text/csv;charset=utf-8;" }
+    );
+
     const url = URL.createObjectURL(blob);
+
     const link = document.createElement("a");
+
     link.href = url;
+
     link.download = "assessment-results.csv";
+
     document.body.appendChild(link);
+
     link.click();
+
     link.remove();
+
     URL.revokeObjectURL(url);
 }
 
+
+// =============================================
+// DELETE ALL RESULTS
+// =============================================
+
 function clearAllResults() {
-    const confirmed = confirm("Delete ALL saved assessment results from this browser? This cannot be undone.");
+
+    const confirmed = confirm(
+        "Delete ALL saved assessment results from this browser? This cannot be undone."
+    );
+
     if (!confirmed) return;
 
     localStorage.removeItem("onlineAssessmentResults");
+
     renderAdminResults();
 }
+
 </script>
+
 </body>
 </html>

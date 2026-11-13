@@ -134,6 +134,72 @@ body.test-active #testPage img{
 .question{font-size:18px}
 .watermark-text{font-size:15px}
 }
+
+/* LIVE CAMERA PANEL */
+#liveCameraPanel {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    width: 230px;
+    z-index: 5000;
+    background: #172b4d;
+    color: #fff;
+    border: 2px solid #43a047;
+    border-radius: 10px;
+    padding: 9px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+    display: none;
+}
+#liveCameraVideo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: #111;
+    border-radius: 6px;
+}
+.live-camera-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 7px;
+    cursor: move;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+#liveCameraPanel.is-dragging {
+    opacity: .96;
+    cursor: grabbing;
+}
+.live-camera-header:active { cursor: grabbing; }
+#cameraLiveStatus { color: #7CFC98; white-space: nowrap; }
+#cameraDisconnectWarning {
+    display: none;
+    margin-top: 7px;
+    padding: 7px;
+    background: #8b1e1e;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 12px;
+    line-height: 1.4;
+}
+@media (max-width: 700px) {
+    #liveCameraPanel {
+        width: clamp(118px, 32vw, 165px);
+        right: 8px;
+        bottom: 8px;
+        padding: 6px;
+        max-height: 34vh;
+        overflow: auto;
+    }
+    .live-camera-header { font-size: 11px; margin-bottom: 5px; }
+    #cameraDisconnectWarning { font-size: 10px; padding: 5px; }
+}
+
 </style>
 </head>
 
@@ -342,6 +408,19 @@ body.test-active #testPage img{
     </div>
 </div>
 
+
+<!-- FLOATING LIVE CAMERA PANEL: visible only while the assessment is active -->
+<div id="liveCameraPanel" aria-live="polite">
+    <div class="live-camera-header">
+        <span>Camera Monitoring</span>
+        <span id="cameraLiveStatus">● CONNECTING</span>
+    </div>
+    <video id="liveCameraVideo" autoplay muted playsinline></video>
+    <div id="cameraDisconnectWarning" role="alert">
+        ⚠ Camera disconnected. Please check your connection.
+    </div>
+</div>
+
 <script>
 
 // =============================================
@@ -536,6 +615,7 @@ let testSubmitted = false;
 
 let capturedPhotoData = null;
 let cameraStream = null;
+let testCameraStream = null;
 
 
 // =============================================
@@ -546,7 +626,7 @@ let cameraStream = null;
 // JavaScript month is zero-based: 10 = November.
 
 const assessmentStartTime =
-    new Date(2026, 10, 12, 11, 40, 0).getTime();
+    new Date(2026, 10, 13, 23, 27, 0).getTime();
 
 // Registration window: 15 minutes.
 const registrationDuration = 15 * 60 * 1000;
@@ -865,11 +945,197 @@ function dismissScreenshotWarning() {
 }
 
 
+
+// =============================================
+// LIVE TEST CAMERA FUNCTIONS
+// Separate from the registration-photo camera.
+// =============================================
+
+async function startTestCamera() {
+    const panel = document.getElementById("liveCameraPanel");
+    const video = document.getElementById("liveCameraVideo");
+    const status = document.getElementById("cameraLiveStatus");
+    const warning = document.getElementById("cameraDisconnectWarning");
+
+    if (!panel || !video || !status || !warning) return;
+
+    panel.style.display = "block";
+    warning.style.display = "none";
+    status.textContent = "● CONNECTING";
+    status.style.color = "#ffd166";
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showCameraDisconnected("Camera access requires HTTPS or localhost.");
+        return;
+    }
+
+    try {
+        // Do not stop a stream that is already active.
+        if (testCameraStream) {
+            testCameraStream.getTracks().forEach(track => track.stop());
+            testCameraStream = null;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+            audio: false
+        });
+
+        // The test may have been submitted while the permission prompt was open.
+        if (!testStarted || testSubmitted) {
+            stream.getTracks().forEach(track => track.stop());
+            panel.style.display = "none";
+            return;
+        }
+
+        testCameraStream = stream;
+        video.srcObject = stream;
+        await video.play();
+
+        const videoTrack = stream.getVideoTracks()[0];
+        if (!videoTrack) throw new Error("No camera video track was found.");
+
+        videoTrack.addEventListener("ended", () => {
+            if (testStarted && !testSubmitted) {
+                showCameraDisconnected("Camera disconnected. Please reconnect it.");
+            }
+        });
+
+        videoTrack.addEventListener("mute", () => {
+            if (testStarted && !testSubmitted) {
+                showCameraDisconnected("Camera feed is temporarily unavailable.");
+            }
+        });
+
+        videoTrack.addEventListener("unmute", () => {
+            if (testStarted && !testSubmitted) {
+                status.textContent = "● LIVE";
+                status.style.color = "#7CFC98";
+                warning.style.display = "none";
+            }
+        });
+
+        if (testStarted && !testSubmitted &&
+            videoTrack.readyState === "live" && !videoTrack.muted) {
+            status.textContent = "● LIVE";
+            status.style.color = "#7CFC98";
+            warning.style.display = "none";
+        }
+    } catch (error) {
+        console.error("Test camera error:", error);
+        if (testStarted && !testSubmitted) {
+            showCameraDisconnected(
+                "Camera could not start. Allow camera permission and check that no other app is using it."
+            );
+        }
+    }
+}
+
+
+// Make the floating camera panel movable with mouse or touch.
+// Drag the panel by its header; it remains inside the visible screen.
+(function enableDraggableCameraPanel() {
+    const panel = document.getElementById("liveCameraPanel");
+    const handle = panel && panel.querySelector(".live-camera-header");
+    if (!panel || !handle) return;
+
+    let dragging = false;
+    let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+    handle.setAttribute("title", "Drag to move camera preview");
+    handle.setAttribute("aria-label", "Drag to move camera preview");
+
+    handle.addEventListener("pointerdown", function (event) {
+        if (event.button !== undefined && event.button !== 0) return;
+
+        const rect = panel.getBoundingClientRect();
+        dragging = true;
+        startX = event.clientX;
+        startY = event.clientY;
+        startLeft = rect.left;
+        startTop = rect.top;
+
+        panel.style.left = rect.left + "px";
+        panel.style.top = rect.top + "px";
+        panel.style.right = "auto";
+        panel.style.bottom = "auto";
+        panel.classList.add("is-dragging");
+
+        if (handle.setPointerCapture) {
+            try { handle.setPointerCapture(event.pointerId); } catch (_) {}
+        }
+        event.preventDefault();
+    });
+
+    handle.addEventListener("pointermove", function (event) {
+        if (!dragging) return;
+
+        const maxLeft = Math.max(0, window.innerWidth - panel.offsetWidth);
+        const maxTop = Math.max(0, window.innerHeight - panel.offsetHeight);
+        const nextLeft = Math.min(maxLeft, Math.max(0, startLeft + event.clientX - startX));
+        const nextTop = Math.min(maxTop, Math.max(0, startTop + event.clientY - startY));
+
+        panel.style.left = nextLeft + "px";
+        panel.style.top = nextTop + "px";
+    });
+
+    function stopDragging() {
+        if (!dragging) return;
+        dragging = false;
+        panel.classList.remove("is-dragging");
+    }
+
+    handle.addEventListener("pointerup", stopDragging);
+    handle.addEventListener("pointercancel", stopDragging);
+    window.addEventListener("resize", function () {
+        if (panel.style.display === "none") return;
+        const rect = panel.getBoundingClientRect();
+        const left = Math.min(Math.max(0, rect.left), Math.max(0, window.innerWidth - panel.offsetWidth));
+        const top = Math.min(Math.max(0, rect.top), Math.max(0, window.innerHeight - panel.offsetHeight));
+        panel.style.left = left + "px";
+        panel.style.top = top + "px";
+        panel.style.right = "auto";
+        panel.style.bottom = "auto";
+    });
+})();
+
+function showCameraDisconnected(message) {
+    const panel = document.getElementById("liveCameraPanel");
+    const status = document.getElementById("cameraLiveStatus");
+    const warning = document.getElementById("cameraDisconnectWarning");
+
+    if (!panel || !status || !warning) return;
+
+    panel.style.display = "block";
+    status.textContent = "● OFFLINE";
+    status.style.color = "#ff8a80";
+    warning.textContent = "⚠ " + message;
+    warning.style.display = "block";
+}
+
+function stopTestCamera() {
+    const video = document.getElementById("liveCameraVideo");
+    const panel = document.getElementById("liveCameraPanel");
+
+    if (testCameraStream) {
+        testCameraStream.getTracks().forEach(track => track.stop());
+        testCameraStream = null;
+    }
+
+    if (video) {
+        video.pause();
+        video.srcObject = null;
+    }
+
+    if (panel) panel.style.display = "none";
+}
+
+
 // =============================================
 // START TEST
 // =============================================
 
-function startTest() {
+async function startTest() {
 
     const now = Date.now();
 
@@ -994,6 +1260,9 @@ function startTest() {
     startTimer();
 
     requestFullScreen();
+
+    // Keep the camera preview active throughout the test.
+    await startTestCamera();
 }
 
 
@@ -1209,6 +1478,9 @@ function submitTest(automatic = false) {
 
     testStarted = false;
 
+    // Immediately release the camera when the test is submitted.
+    stopTestCamera();
+
     clearInterval(timer);
 
     document.getElementById("fullscreenWarning").style.display = "none";
@@ -1322,6 +1594,9 @@ function submitTest(automatic = false) {
         testSubmitted = false;
 
         testStarted = true;
+
+        // Restore camera if submission could not be saved.
+        startTestCamera();
 
         return;
     }

@@ -1,6 +1,6 @@
 // Assessment functionality: registration, timer, camera, questions, results, and admin panel.
 // =============================================
-// QUESTION BANK - 25 QUESTIONS
+// QUESTION BANK - 45 QUESTIONS
 // =============================================
 
 
@@ -40,7 +40,7 @@ const assessmentStartTime =
     new Date(2026, 10, 16, 12, 30, 0).getTime();
 
 // Registration window: 25 minutes.
-const registrationDuration = 255 * 60 * 1000;
+const registrationDuration = 25 * 60 * 1000;
 
 // Registration closing time.
 const assessmentEndTime =

@@ -1,407 +1,271 @@
-
-// Question bank for the Online Assessment
 const questions = [
 
-    // Python Functions (Q1–Q15)
+    // ==========================================
+    // BASIC LEVEL (Q1–Q15)
+    // Python Basics, Operators, Strings, Lists,
+    // Loops, Conditions and Functions
+    // ==========================================
 
     {
-        question: "Which keyword is used to define a function in Python?",
-        options: ["function", "def", "fun", "define"],
+        question: "What will be the output?\n\nx = 10\ny = 3\nprint(x // y)",
+        options: ["3.33", "3", "4", "1"],
         answer: 1
     },
     {
-        question: "Which keyword is used to return a value from a function?",
-        options: ["print", "break", "return", "pass"],
+        question: "What will be the output?\n\nx = 5\nx += 3\nx *= 2\nprint(x)",
+        options: ["11", "13", "16", "10"],
         answer: 2
     },
     {
-        question: "What will be the output of the following code?\n\ndef add(a, b):\n    return a + b\nprint(add(10, 20))",
-        options: ["10", "20", "30", "1020"],
+        question: "What will be the output?\n\nx = 10\nif x > 5:\n    print('Python')\nelse:\n    print('Java')",
+        options: ["Java", "Python", "True", "Error"],
+        answer: 1
+    },
+    {
+        question: "What will be the output?\n\nfor i in range(1, 5):\n    print(i, end=' ')",
+        options: ["1 2 3 4 5", "0 1 2 3", "1 2 3 4", "2 3 4 5"],
         answer: 2
     },
     {
-        question: "What does a Python function return if no return statement is specified?",
-        options: ["0", "False", "None", "Error"],
+        question: "What will be the output?\n\nx = [10, 20, 30, 40]\nprint(x[2])",
+        options: ["10", "20", "30", "40"],
         answer: 2
     },
     {
-        question: "Which parameter accepts a variable number of positional arguments?",
-        options: ["*args", "**kwargs", "args[]", "var"],
+        question: "What will be the output?\n\nname = 'PYTHON'\nprint(name[1:4])",
+        options: ["PYT", "YTH", "THO", "YTHO"],
+        answer: 1
+    },
+    {
+        question: "What will be the output?\n\nnumbers = [1, 2, 3]\nnumbers.append(4)\nprint(numbers)",
+        options: [
+            "[1, 2, 3]",
+            "[4, 1, 2, 3]",
+            "[1, 2, 3, 4]",
+            "[1, 2, 4]"
+        ],
+        answer: 2
+    },
+    {
+        question: "What will be the output?\n\nx = 10\nif x % 2 == 0:\n    print('Even')\nelse:\n    print('Odd')",
+        options: ["Odd", "Even", "10", "Error"],
+        answer: 1
+    },
+    {
+        question: "What will be the output?\n\nx = 0\nfor i in range(1, 4):\n    x += i\nprint(x)",
+        options: ["3", "5", "6", "10"],
+        answer: 2
+    },
+    {
+        question: "What will be the output?\n\ndef add(a, b):\n    return a + b\n\nprint(add(5, 7))",
+        options: ["12", "57", "5", "7"],
         answer: 0
     },
     {
-        question: "Which parameter accepts a variable number of keyword arguments?",
-        options: ["*args", "**kwargs", "kwargs[]", "key"],
+        question: "What will be the output?\n\nx = [2, 4, 6, 8]\nprint(len(x))",
+        options: ["3", "4", "5", "8"],
         answer: 1
     },
     {
-        question: "What will be the output?\n\ndef greet(name='Student'):\n    print('Hello', name)\ngreet()",
-        options: ["Hello", "Hello Student", "Student", "Error"],
-        answer: 1
-    },
-    {
-        question: "Which statement is used to stop a function and return a value?",
-        options: ["break", "stop", "return", "exit"],
-        answer: 2
-    },
-    {
-        question: "What is a function calling itself known as?",
-        options: ["Iteration", "Recursion", "Inheritance", "Looping"],
-        answer: 1
-    },
-    {
-        question: "Which built-in function returns the length of an object?",
-        options: ["size()", "count()", "length()", "len()"],
-        answer: 3
-    },
-    {
-        question: "What will be the output?\n\ndef square(x):\n    return x * x\nprint(square(5))",
-        options: ["10", "15", "25", "55"],
-        answer: 2
-    },
-    {
-        question: "Which of the following is a lambda function?",
-        options: [
-            "A function without a name",
-            "A class",
-            "A loop",
-            "A module"
-        ],
+        question: "What will be the output?\n\nx = 5\nwhile x > 2:\n    print(x, end=' ')\n    x -= 1",
+        options: ["5 4 3", "5 4 3 2", "4 3 2", "5 4"],
         answer: 0
     },
     {
-        question: "Which keyword is used to create an anonymous function?",
-        options: ["def", "lambda", "anonymous", "function"],
-        answer: 1
-    },
-    {
-        question: "What will be the output?\n\ndef multiply(a, b=2):\n    return a * b\nprint(multiply(5))",
-        options: ["5", "7", "10", "Error"],
+        question: "What will be the output?\n\nx = (10, 20, 30)\nprint(x[-1])",
+        options: ["10", "20", "30", "Error"],
         answer: 2
     },
     {
-        question: "Which statement passes a function without performing any operation?",
-        options: ["break", "continue", "pass", "return"],
+        question: "What will be the output?\n\nstudent = {'name': 'Prem', 'age': 25}\nprint(student['name'])",
+        options: ["student", "name", "Prem", "25"],
+        answer: 2
+    },
+    {
+        question: "What will be the output?\n\nx = lambda a: a * a\nprint(x(6))",
+        options: ["12", "30", "36", "6"],
         answer: 2
     },
 
-    // Python Classes and Objects (Q16–Q30)
+
+    // ==========================================
+    // MEDIUM LEVEL (Q16–Q30)
+    // Nested Loops, Functions, Recursion,
+    // Lists, Dictionaries and Classes
+    // ==========================================
 
     {
-        question: "Which keyword is used to define a class in Python?",
-        options: ["def", "object", "class", "struct"],
-        answer: 2
-    },
-    {
-        question: "What is an object in Python?",
-        options: [
-            "A function",
-            "An instance of a class",
-            "A loop",
-            "A module"
-        ],
-        answer: 1
-    },
-    {
-        question: "Which method is commonly used as a constructor in Python?",
-        options: ["__start__()", "__main__()", "__create__()", "__init__()"],
-        answer: 3
-    },
-    {
-        question: "What does self represent in a Python class?",
-        options: [
-            "The parent class",
-            "The current object",
-            "A global variable",
-            "A function"
-        ],
-        answer: 1
-    },
-    {
-        question: "What will be the output?\n\nclass Student:\n    def display(self):\n        print('MCA')\ns = Student()\ns.display()",
-        options: ["Student", "display", "MCA", "Error"],
-        answer: 2
-    },
-    {
-        question: "Which operator accesses object attributes and methods?",
-        options: ["->", ".", "::", "#"],
-        answer: 1
-    },
-    {
-        question: "What will be the output?\n\nclass Person:\n    def __init__(self, name):\n        self.name = name\np = Person('Prem')\nprint(p.name)",
-        options: ["Person", "name", "Prem", "Error"],
-        answer: 2
-    },
-    {
-        question: "Which function checks whether an object belongs to a particular class?",
-        options: ["type()", "check()", "isinstance()", "object()"],
-        answer: 2
-    },
-    {
-        question: "What is a class in Python?",
-        options: [
-            "A blueprint for creating objects",
-            "A loop",
-            "A variable",
-            "A conditional statement"
-        ],
+        question: "What will be the output?\n\nfor i in range(1, 4):\n    for j in range(1, 3):\n        print(i + j, end=' ')",
+        options: ["2 3 3 4 4 5", "1 2 3 4 5 6", "2 3 4 5", "3 4 5 6"],
         answer: 0
     },
     {
-        question: "What will be the output?\n\nclass Test:\n    x = 10\nt = Test()\nprint(t.x)",
-        options: ["0", "10", "x", "Error"],
+        question: "What will be the output?\n\nnumbers = [1, 2, 3, 4, 5]\nresult = [x * 2 for x in numbers if x % 2 == 0]\nprint(result)",
+        options: ["[2, 4, 6, 8, 10]", "[4, 8]", "[2, 4]", "[1, 3, 5]"],
         answer: 1
     },
     {
-        question: "Which method is automatically called when an object is created?",
-        options: ["display()", "start()", "__init__()", "main()"],
+        question: "What will be the output?\n\ndef calculate(a, b=5):\n    return a + b\n\nprint(calculate(10))",
+        options: ["5", "10", "15", "Error"],
         answer: 2
     },
     {
-        question: "What is an instance variable?",
-        options: [
-            "A variable shared by all classes",
-            "A variable belonging to an object",
-            "A global variable",
-            "A loop variable"
-        ],
+        question: "What will be the output?\n\ndef fun(*args):\n    return sum(args)\n\nprint(fun(2, 4, 6))",
+        options: ["6", "10", "12", "246"],
+        answer: 2
+    },
+    {
+        question: "What will be the output?\n\ndef factorial(n):\n    if n == 1:\n        return 1\n    return n * factorial(n - 1)\n\nprint(factorial(4))",
+        options: ["10", "16", "24", "12"],
+        answer: 2
+    },
+    {
+        question: "What will be the output?\n\nx = [1, 2, 3]\ny = x\nx.append(4)\nprint(y)",
+        options: ["[1, 2, 3]", "[1, 2, 3, 4]", "[4]", "Error"],
         answer: 1
     },
     {
-        question: "What will be the output?\n\nclass Student:\n    def __init__(self):\n        self.name = 'Rahul'\ns = Student()\nprint(s.name)",
-        options: ["Student", "Rahul", "name", "Error"],
+        question: "What will be the output?\n\nx = {'a': 10, 'b': 20}\nx['c'] = 30\nprint(len(x))",
+        options: ["2", "3", "4", "30"],
         answer: 1
     },
     {
-        question: "Which function returns the type of an object?",
-        options: ["typeof()", "type()", "class()", "object()"],
+        question: "What will be the output?\n\nx = [10, 20, 30, 40, 50]\nprint(x[1:-1])",
+        options: ["[10, 20, 30]", "[20, 30, 40]", "[20, 30, 40, 50]", "[10, 20, 30, 40]"],
         answer: 1
     },
     {
-        question: "What is the correct way to create an object of class Student?",
-        options: [
-            "Student = object",
-            "Student()",
-            "new Student",
-            "class Student()"
-        ],
+        question: "What will be the output?\n\nx = 10\ndef test():\n    x = 20\n    print(x)\n\ntest()\nprint(x)",
+        options: ["10 20", "20 10", "20 20", "10 10"],
+        answer: 1
+    },
+    {
+        question: "What will be the output?\n\nnumbers = [1, 2, 3, 4]\nprint(list(map(lambda x: x ** 2, numbers)))",
+        options: ["[1, 2, 3, 4]", "[2, 4, 6, 8]", "[1, 4, 9, 16]", "[1, 8, 27, 64]"],
+        answer: 2
+    },
+    {
+        question: "What will be the output?\n\nx = [1, 2, 3, 4, 5]\nfor i in x:\n    if i == 3:\n        break\n    print(i, end=' ')",
+        options: ["1 2 3", "1 2", "2 3", "1 2 3 4 5"],
+        answer: 1
+    },
+    {
+        question: "What will be the output?\n\nx = [1, 2, 3, 4, 5]\nfor i in x:\n    if i == 3:\n        continue\n    print(i, end=' ')",
+        options: ["1 2 3 4 5", "1 2 4 5", "3", "1 2"],
+        answer: 1
+    },
+    {
+        question: "What will be the output?\n\nclass Student:\n    def __init__(self, name):\n        self.name = name\n\ns = Student('Prem')\nprint(s.name)",
+        options: ["Student", "name", "Prem", "Error"],
+        answer: 2
+    },
+    {
+        question: "What will be the output?\n\nclass Test:\n    x = 10\n\na = Test()\nb = Test()\na.x = 20\nprint(a.x, b.x)",
+        options: ["10 10", "20 20", "20 10", "10 20"],
+        answer: 2
+    },
+    {
+        question: "What will be the output?\n\nx = [1, 2, 3]\nprint(x[::-1])",
+        options: ["[1, 2, 3]", "[3, 2, 1]", "[2, 1, 3]", "Error"],
         answer: 1
     },
 
-    // Python Single Inheritance (Q31–Q45)
+
+    // ==========================================
+    // ADVANCED LEVEL (Q31–Q45)
+    // Advanced Coding Puzzles, Functions,
+    // Objects, Constructors and Single Inheritance
+    // ==========================================
 
     {
-        question: "What is inheritance in Python?",
+        question: "What will be the output?\n\nx = [1, 2, 3]\ny = x.copy()\ny.append(4)\nprint(x)",
+        options: ["[1, 2, 3, 4]", "[1, 2, 3]", "[4]", "Error"],
+        answer: 1
+    },
+    {
+        question: "What will be the output?\n\nx = [1, 2, 3]\ny = x\nz = x.copy()\ny.append(4)\nz.append(5)\nprint(x, z)",
         options: [
-            "Creating a loop",
-            "Acquiring properties and methods of another class",
-            "Defining a function",
-            "Creating a variable"
+            "[1, 2, 3] [1, 2, 3, 5]",
+            "[1, 2, 3, 4] [1, 2, 3, 5]",
+            "[1, 2, 3, 4, 5] [1, 2, 3, 5]",
+            "Error"
         ],
         answer: 1
     },
     {
-        question: "What is single inheritance?",
-        options: [
-            "One class inherits from one parent class",
-            "One class inherits from multiple classes",
-            "Multiple classes inherit from one class",
-            "A class inherits from itself"
-        ],
-        answer: 0
-    },
-    {
-        question: "Which function is commonly used to call the parent class constructor?",
-        options: ["parent()", "this()", "super()", "base()"],
+        question: "What will be the output?\n\ndef test(a, b, c=10):\n    return a + b + c\n\nprint(test(5, c=20, b=10))",
+        options: ["25", "30", "35", "Error"],
         answer: 2
     },
     {
-        question: "What will be the output?\n\nclass A:\n    def show(self):\n        print('Parent Class')\nclass B(A):\n    pass\nobj = B()\nobj.show()",
-        options: ["Child Class", "Parent Class", "B", "Error"],
+        question: "What will be the output?\n\nx = [1, 2, 3, 4]\nresult = [i for i in x if i % 2 != 0]\nprint(sum(result))",
+        options: ["4", "5", "6", "10"],
         answer: 1
     },
     {
-        question: "In class Dog(Animal), which class is the parent class?",
-        options: ["Dog", "Animal", "Both", "None"],
+        question: "What will be the output?\n\nx = 10\ndef test():\n    global x\n    x = 25\n\ntest()\nprint(x)",
+        options: ["10", "25", "None", "Error"],
         answer: 1
     },
     {
-        question: "What is one major advantage of inheritance?",
-        options: [
-            "Code reusability",
-            "Code duplication",
-            "Slower execution",
-            "Memory wastage"
-        ],
-        answer: 0
+        question: "What will be the output?\n\nclass A:\n    def __init__(self):\n        self.x = 10\n\nclass B(A):\n    pass\n\nobj = B()\nprint(obj.x)",
+        options: ["0", "10", "None", "Error"],
+        answer: 1
     },
     {
-        question: "What will be the output?\n\nclass Human:\n    def __init__(self):\n        self.eyes = 2\nclass Male(Human):\n    pass\nm = Male()\nprint(m.eyes)",
-        options: ["0", "1", "2", "Error"],
+        question: "What will be the output?\n\nclass A:\n    def show(self):\n        print('Parent')\n\nclass B(A):\n    def show(self):\n        print('Child')\n\nobj = B()\nobj.show()",
+        options: ["Parent", "Child", "Parent Child", "Error"],
+        answer: 1
+    },
+    {
+        question: "What will be the output?\n\nclass A:\n    def __init__(self):\n        self.x = 10\n\nclass B(A):\n    def __init__(self):\n        super().__init__()\n        self.y = 20\n\nobj = B()\nprint(obj.x + obj.y)",
+        options: ["10", "20", "30", "Error"],
         answer: 2
     },
     {
-        question: "Which is the correct syntax for single inheritance in Python?",
-        options: [
-            "class B inherits A:",
-            "class B(A):",
-            "class B extends A:",
-            "class B -> A:"
-        ],
+        question: "What will be the output?\n\nclass Human:\n    def __init__(self):\n        self.eyes = 2\n\nclass Male(Human):\n    def __init__(self, name):\n        super().__init__()\n        self.name = name\n\nm = Male('Prem')\nprint(m.name, m.eyes)",
+        options: ["Prem 1", "Prem 2", "Male 2", "Error"],
         answer: 1
     },
     {
-        question: "What is method overriding in Python?",
-        options: [
-            "Defining a new variable",
-            "Calling a function repeatedly",
-            "Redefining a parent class method in the child class",
-            "Deleting a parent class"
-        ],
+        question: "What will be the output?\n\nclass A:\n    x = 100\n\nclass B(A):\n    x = 200\n\nobj = B()\nprint(obj.x)",
+        options: ["100", "200", "300", "Error"],
+        answer: 1
+    },
+    {
+        question: "What will be the output?\n\nclass A:\n    def show(self):\n        print('A')\n\nclass B(A):\n    def display(self):\n        self.show()\n        print('B')\n\nobj = B()\nobj.display()",
+        options: ["A B", "B A", "Only A", "Error"],
+        answer: 0
+    },
+    {
+        question: "What will be the output?\n\nclass Parent:\n    def __init__(self):\n        self.a = 5\n\nclass Child(Parent):\n    def __init__(self):\n        super().__init__()\n        self.a += 10\n\nobj = Child()\nprint(obj.a)",
+        options: ["5", "10", "15", "Error"],
         answer: 2
     },
     {
-        question: "What will be the output?\n\nclass A:\n    def show(self):\n        print('Class A')\nclass B(A):\n    def show(self):\n        print('Class B')\nobj = B()\nobj.show()",
-        options: ["Class A", "Class B", "A", "Error"],
-        answer: 1
-    },
-    {
-        question: "What is the child class also known as?",
-        options: ["Base class", "Parent class", "Derived class", "Main class"],
-        answer: 2
-    },
-    {
-        question: "What is the parent class also known as?",
-        options: ["Derived class", "Base class", "Child class", "Object instance"],
-        answer: 1
-    },
-    {
-        question: "What will be the output?\n\nclass A:\n    x = 100\nclass B(A):\n    pass\nobj = B()\nprint(obj.x)",
-        options: ["0", "100", "B", "Error"],
-        answer: 1
-    },
-    {
-        question: "Which symbol is used to specify the parent class?",
-        options: ["[ ]", "( )", "{ }", "< >"],
-        answer: 1
-    },
-    {
-        question: "Can a child class access public methods of its parent class?",
-        options: ["Yes", "No", "Only with import", "Only with return"],
-        answer: 0
-    },
-
-    // Python OOP Concepts and Method Overriding (Q46–Q60)
-
-    {
-        question: "What does OOP stand for?",
-        options: [
-            "Object-Oriented Programming",
-            "Object Operating Process",
-            "Open Object Programming",
-            "Ordered Operation Program"
-        ],
+        question: "What will be the output?\n\nclass A:\n    def show(self):\n        print('Hello from A')\n\nclass B(A):\n    pass\n\nclass C(B):\n    pass\n\nobj = C()\nobj.show()",
+        options: ["Hello from A", "Hello from B", "Hello from C", "Error"],
         answer: 0
     },
     {
-        question: "Which of the following is a major concept of OOP?",
-        options: ["Looping", "Encapsulation", "Compilation", "Iteration"],
-        answer: 1
-    },
-    {
-        question: "What is encapsulation?",
+        question: "What will be the output?\n\nclass Animal:\n    def sound(self):\n        print('Animal Sound')\n\nclass Dog(Animal):\n    def sound(self):\n        super().sound()\n        print('Bark')\n\nd = Dog()\nd.sound()",
         options: [
-            "Combining data and methods into a single unit",
-            "Creating multiple loops",
-            "Deleting objects",
-            "Repeating code"
-        ],
-        answer: 0
-    },
-    {
-        question: "What is polymorphism?",
-        options: [
-            "One name with many forms",
-            "One class only",
-            "Creating variables",
-            "Hiding files"
-        ],
-        answer: 0
-    },
-    {
-        question: "What will be the output?\n\nclass A:\n    def display(self):\n        print('A')\nclass B(A):\n    def display(self):\n        print('B')\nobj = B()\nobj.display()",
-        options: ["A", "B", "AB", "Error"],
-        answer: 1
-    },
-    {
-        question: "Which method is used to access the parent class implementation?",
-        options: ["parent()", "super()", "base()", "this()"],
-        answer: 1
-    },
-    {
-        question: "What is abstraction in Python?",
-        options: [
-            "Hiding implementation details",
-            "Showing all internal code",
-            "Creating objects only",
-            "Repeating statements"
-        ],
-        answer: 0
-    },
-    {
-        question: "Which module provides support for abstract base classes?",
-        options: ["math", "random", "abc", "os"],
-        answer: 2
-    },
-    {
-        question: "Which decorator is used to define an abstract method?",
-        options: [
-            "@staticmethod",
-            "@abstractmethod",
-            "@classmethod",
-            "@property"
-        ],
-        answer: 1
-    },
-    {
-        question: "What will be the output?\n\nclass A:\n    def show(self):\n        print('Hello')\nclass B(A):\n    pass\nb = B()\nb.show()",
-        options: ["B", "Hello", "A", "Error"],
-        answer: 1
-    },
-    {
-        question: "Which OOP concept allows the same method name to behave differently?",
-        options: [
-            "Inheritance",
-            "Encapsulation",
-            "Polymorphism",
-            "Abstraction"
+            "Bark",
+            "Animal Sound",
+            "Animal Sound Bark",
+            "Error"
         ],
         answer: 2
     },
     {
-        question: "What is the purpose of the pass statement in a class?",
+        question: "Find the error in the following code.\n\nclass Human:\n    def __init__(self):\n        self.eyes = 2\n\nclass Male(Human):\n    def __init__(self, name):\n        super().__init__()\n        self.name = name\n\nm = Male()\nprint(m.name)",
         options: [
-            "To terminate the class",
-            "To define an empty class body",
-            "To create an object",
-            "To inherit another class"
+            "Error in class Human",
+            "Error in super()",
+            "Missing required argument name while creating Male object",
+            "No error"
         ],
-        answer: 1
-    },
-    {
-        question: "What will be the output?\n\nclass Animal:\n    def sound(self):\n        print('Animal Sound')\nclass Dog(Animal):\n    def sound(self):\n        print('Bark')\nd = Dog()\nd.sound()",
-        options: ["Animal Sound", "Bark", "Dog", "Error"],
-        answer: 1
-    },
-    {
-        question: "Which of the following is used to delete an object attribute?",
-        options: ["remove", "delete", "del", "clear"],
         answer: 2
-    },
-    {
-        question: "Which function returns all attributes and methods of an object?",
-        options: ["help()", "dir()", "type()", "id()"],
-        answer: 1
     }
 
 ];

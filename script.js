@@ -37,7 +37,7 @@ let testCameraStream = null;
 // JavaScript month is zero-based: 10 = November.
 
 const assessmentStartTime =
-    new Date(2026, 10, 16, 13, 10, 0).getTime();
+    new Date(2026, 10, 16, 11, 51, 0).getTime();
 
 // Registration window: 25 minutes.
 const registrationDuration = 15 * 60 * 1000;
@@ -649,7 +649,7 @@ async function startTest() {
     reviewQuestions = new Array(questions.length).fill(false);
 
     // Test duration: 15 minutes.
-    timeLeft = 15 * 60;
+    timeLeft = 25 * 60;
 
     testStarted = true;
 

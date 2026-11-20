@@ -37,7 +37,7 @@ let testCameraStream = null;
 // JavaScript month is zero-based: 10 = November.
 
 const assessmentStartTime =
-    new Date(2026, 10, 18, 19, 30, 0).getTime();
+    new Date(2026, 10, 21, 12, 0, 0).getTime();
 
 // Registration window: 25 minutes.
 const registrationDuration = 15 * 60 * 1000;
